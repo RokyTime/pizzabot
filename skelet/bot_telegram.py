@@ -8,6 +8,8 @@ from handlers import client, admin, other
 async def on_startup(_):
     print("Бот онлайн") 
 
+
+admin.register_handler_admin(dp)
 client.register_handler_client(dp)
 other.register_handler_other(dp)
 
