@@ -67,3 +67,5 @@ def register_handler_admin(dp : Dispatcher):
     dp.register_message_handler(load_name, state=FSMAdmin.name)
     dp.register_message_handler(load_description, state=FSMAdmin.description)
     dp.register_message_handler(load_price, state=FSMAdmin.price)
+    dp.register_message_handler(cancel_handler, state='*', commands=['Отмена'])
+    dp.register_message_handler(cancel_handler, Text(equals='отмена', ignore_case=True), state='*')
