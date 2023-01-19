@@ -1,15 +1,27 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types
-from create_bot import dp
+from create_bot import dp, bot
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters import Text
+
+
+admin_ID = '1996472029'
+
+
 
 class FSMAdmin(StatesGroup):
     photo = State()
     name = State()
     description = State()
     price = State()
+
+async def make_changes_command(message : types.Message):
+    global admin_ID
+    if message.from_user.id == admin_ID:
+        await bot.send_message(message.from_user.id, 'Панель настройки.')
+
+
 
 #@dp.message_handler(commands=['Добавить_пункт_меню'], state=None)
 async def cm_start(message : types.Message):
@@ -50,8 +62,8 @@ async def load_price(message : types.Message, state=FSMContext):
             await message.reply('Нужно ввести только число.\nДобавь пункт в меню заново.')
             await state.finish()
 
-dp.message_handler(state='*', commands=['Отмена'])
-dp.message_handler(Text(equals='отмена', ignore_case=True), state='*')
+#dp.message_handler(state='*', commands=['Отмена'])
+#dp.message_handler(Text(equals='отмена', ignore_case=True), state='*')
 async def cancel_handler(message : types.message, state=FSMContext):
     current_state = await state.get_state()
     if current_state == None:
@@ -62,10 +74,12 @@ async def cancel_handler(message : types.message, state=FSMContext):
 
 
 def register_handler_admin(dp : Dispatcher):
+    dp.register_message_handler(make_changes_command, commands=['Настроки'])
     dp.register_message_handler(cm_start, commands=['Добавить_пункт_меню'], state=None)
+    dp.register_message_handler(cancel_handler, state='*', commands=['Отмена'])
+    dp.register_message_handler(cancel_handler, Text(equals='отмена', ignore_case=True), state='*')
     dp.register_message_handler(load_photo, content_types=['photo'], state=FSMAdmin.photo)
     dp.register_message_handler(load_name, state=FSMAdmin.name)
     dp.register_message_handler(load_description, state=FSMAdmin.description)
     dp.register_message_handler(load_price, state=FSMAdmin.price)
-    dp.register_message_handler(cancel_handler, state='*', commands=['Отмена'])
-    dp.register_message_handler(cancel_handler, Text(equals='отмена', ignore_case=True), state='*')
+    
