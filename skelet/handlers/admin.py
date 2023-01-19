@@ -25,52 +25,58 @@ async def make_changes_command(message : types.Message):
 
 #@dp.message_handler(commands=['Добавить_пункт_меню'], state=None)
 async def cm_start(message : types.Message):
-    await FSMAdmin.photo.set()
-    await message.reply('Загрузи фото.')
+    if message.from_user.id == admin_ID:
+        await FSMAdmin.photo.set()
+        await message.reply('Загрузи фото.')
 
 
 #@dp.message_handler(content_types=['photo'], state=FSMAdmin.photo)
 async def load_photo(message : types.Message, state=FSMContext):
-    async with state.proxy() as data:
-        data['photo'] = message.photo[0].file_id
-    await FSMAdmin.next()
-    await message.reply('Теперь введи название.')
+    if message.from_user.id == admin_ID:
+        async with state.proxy() as data:
+            data['photo'] = message.photo[0].file_id
+        await FSMAdmin.next()
+        await message.reply('Теперь введи название.')
 
 #@dp.message_handler(state=FSMAdmin.name)
 async def load_name(message : types.Message, state=FSMContext):
-    async with state.proxy() as data:
-        data['name'] = message.text
-    await FSMAdmin.next()
-    await message.reply('Теперь введи описание.')
+    if message.from_user.id == admin_ID:
+        async with state.proxy() as data:
+            data['name'] = message.text
+        await FSMAdmin.next()
+        await message.reply('Теперь введи описание.')
 
 #@dp.message_handler(state=FSMAdmin.description)
 async def load_description(message : types.Message, state=FSMContext):
-    async with state.proxy() as data:
-        data['description'] = message.text
-    await FSMAdmin.next()
-    await message.reply('Теперь введи цену.')
+    if message.from_user.id == admin_ID:
+        async with state.proxy() as data:
+            data['description'] = message.text
+        await FSMAdmin.next()
+        await message.reply('Теперь введи цену.')
 
 
 #@dp.message_handler(state=FSMAdmin.price)
 async def load_price(message : types.Message, state=FSMContext):
-    async with state.proxy() as data:
-        try:
-            data['price'] = float(message.text)
-            async with state.proxy() as data:
-                await message.reply(str(data))
-        except:
-            await message.reply('Нужно ввести только число.\nДобавь пункт в меню заново.')
-            await state.finish()
+    if message.from_user.id == admin_ID:
+        async with state.proxy() as data:
+            try:
+                data['price'] = float(message.text)
+                async with state.proxy() as data:
+                    await message.reply(str(data))
+            except:
+                await message.reply('Нужно ввести только число.\nДобавь пункт в меню заново.')
+                await state.finish()
 
 #dp.message_handler(state='*', commands=['Отмена'])
 #dp.message_handler(Text(equals='отмена', ignore_case=True), state='*')
 async def cancel_handler(message : types.message, state=FSMContext):
-    current_state = await state.get_state()
-    if current_state == None:
-        return
-    else:
-        await state.finish()
-        await message.reply('Ок.')
+    if message.from_user.id == admin_ID:
+        current_state = await state.get_state()
+        if current_state == None:
+            return
+        else:
+            await state.finish()
+            await message.reply('Ок.')
 
 
 def register_handler_admin(dp : Dispatcher):
