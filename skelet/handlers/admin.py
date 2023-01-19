@@ -3,6 +3,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types
 from create_bot import dp
 from aiogram import Dispatcher
+from aiogram.dispatcher.filters import Text
 
 class FSMAdmin(StatesGroup):
     photo = State()
@@ -49,6 +50,15 @@ async def load_price(message : types.Message, state=FSMContext):
             await message.reply('Нужно ввести только число.\nДобавь пункт в меню заново.')
             await state.finish()
 
+dp.message_handler(state='*', commands=['Отмена'])
+dp.message_handler(Text(equals='отмена', ignore_case=True), state='*')
+async def cancel_handler(message : types.message, state=FSMContext):
+    current_state = await state.get_state()
+    if current_state == None:
+        return
+    else:
+        await state.finish()
+        await message.reply('Ок.')
 
 
 def register_handler_admin(dp : Dispatcher):
