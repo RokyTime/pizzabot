@@ -6,7 +6,7 @@ from aiogram import Dispatcher
 from aiogram.dispatcher.filters import Text
 
 
-admin_ID = '1996472029'
+admin_ID = ['1996472029']
 
 
 
@@ -18,21 +18,21 @@ class FSMAdmin(StatesGroup):
 
 async def make_changes_command(message : types.Message):
     global admin_ID
-    if message.from_user.id == admin_ID:
+    if message.from_user.id in admin_ID:
         await bot.send_message(message.from_user.id, 'Панель настройки.')
 
 
 
 #@dp.message_handler(commands=['Добавить_пункт_меню'], state=None)
 async def cm_start(message : types.Message):
-    if message.from_user.id == admin_ID:
+    if message.from_user.id in admin_ID:
         await FSMAdmin.photo.set()
         await message.reply('Загрузи фото.')
 
 
 #@dp.message_handler(content_types=['photo'], state=FSMAdmin.photo)
 async def load_photo(message : types.Message, state=FSMContext):
-    if message.from_user.id == admin_ID:
+    if message.from_user.id in admin_ID:
         async with state.proxy() as data:
             data['photo'] = message.photo[0].file_id
         await FSMAdmin.next()
@@ -40,7 +40,7 @@ async def load_photo(message : types.Message, state=FSMContext):
 
 #@dp.message_handler(state=FSMAdmin.name)
 async def load_name(message : types.Message, state=FSMContext):
-    if message.from_user.id == admin_ID:
+    if message.from_user.id in admin_ID:
         async with state.proxy() as data:
             data['name'] = message.text
         await FSMAdmin.next()
@@ -48,7 +48,7 @@ async def load_name(message : types.Message, state=FSMContext):
 
 #@dp.message_handler(state=FSMAdmin.description)
 async def load_description(message : types.Message, state=FSMContext):
-    if message.from_user.id == admin_ID:
+    if message.from_user.id in admin_ID:
         async with state.proxy() as data:
             data['description'] = message.text
         await FSMAdmin.next()
@@ -57,7 +57,7 @@ async def load_description(message : types.Message, state=FSMContext):
 
 #@dp.message_handler(state=FSMAdmin.price)
 async def load_price(message : types.Message, state=FSMContext):
-    if message.from_user.id == admin_ID:
+    if message.from_user.id in admin_ID:
         async with state.proxy() as data:
             try:
                 data['price'] = float(message.text)
@@ -70,7 +70,7 @@ async def load_price(message : types.Message, state=FSMContext):
 #dp.message_handler(state='*', commands=['Отмена'])
 #dp.message_handler(Text(equals='отмена', ignore_case=True), state='*')
 async def cancel_handler(message : types.message, state=FSMContext):
-    if message.from_user.id == admin_ID:
+    if message.from_user.id in admin_ID:
         current_state = await state.get_state()
         if current_state == None:
             return
