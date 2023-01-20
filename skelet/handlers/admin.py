@@ -4,9 +4,11 @@ from aiogram import types
 from create_bot import dp, bot
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters import Text
+from keyboards import kb_admin, kb_client
+from aiogram.types import ReplyKeyboardRemove
 
 
-admin_ID = ['1996472029']
+admin_ID = [1996472029]
 
 
 
@@ -19,7 +21,10 @@ class FSMAdmin(StatesGroup):
 async def make_changes_command(message : types.Message):
     global admin_ID
     if message.from_user.id in admin_ID:
-        await bot.send_message(message.from_user.id, 'Панель настройки.')
+        await bot.send_message(message.from_user.id, '...', reply_markup=ReplyKeyboardRemove())
+        await bot.send_message(message.from_user.id, 'Панель настройки.', reply_markup=kb_admin)
+    else:
+        bot.send_message(message.from_user.id, 'Вы не являетесь администратором.')
 
 
 
@@ -28,6 +33,21 @@ async def cm_start(message : types.Message):
     if message.from_user.id in admin_ID:
         await FSMAdmin.photo.set()
         await message.reply('Загрузи фото.')
+
+
+#dp.message_handler(state='*', commands=['Отмена'])
+#dp.message_handler(Text(equals='отмена', ignore_case=True), state='*')
+async def cancel_handler(message : types.message, state=FSMContext):
+    if message.from_user.id in admin_ID:
+        await bot.send_message(message.from_user.id, 'Ok.', reply_markup=ReplyKeyboardRemove())
+        await bot.send_message(message.from_user.id, 'Отменено.', reply_markup=kb_client)
+        current_state = await state.get_state()
+        if current_state == None:
+            return
+        else:
+            await state.finish()
+        
+
 
 
 #@dp.message_handler(content_types=['photo'], state=FSMAdmin.photo)
@@ -67,20 +87,10 @@ async def load_price(message : types.Message, state=FSMContext):
                 await message.reply('Нужно ввести только число.\nДобавь пункт в меню заново.')
                 await state.finish()
 
-#dp.message_handler(state='*', commands=['Отмена'])
-#dp.message_handler(Text(equals='отмена', ignore_case=True), state='*')
-async def cancel_handler(message : types.message, state=FSMContext):
-    if message.from_user.id in admin_ID:
-        current_state = await state.get_state()
-        if current_state == None:
-            return
-        else:
-            await state.finish()
-            await message.reply('Ок.')
 
 
 def register_handler_admin(dp : Dispatcher):
-    dp.register_message_handler(make_changes_command, commands=['Настроки'])
+    dp.register_message_handler(make_changes_command, commands=['Админ_панель'])
     dp.register_message_handler(cm_start, commands=['Добавить_пункт_меню'], state=None)
     dp.register_message_handler(cancel_handler, state='*', commands=['Отмена'])
     dp.register_message_handler(cancel_handler, Text(equals='отмена', ignore_case=True), state='*')
