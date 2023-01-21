@@ -6,7 +6,7 @@ from aiogram import Dispatcher
 from aiogram.dispatcher.filters import Text
 from keyboards import kb_admin, kb_client
 from aiogram.types import ReplyKeyboardRemove
-
+from data_base.sqlite_db import sql_add
 
 admin_ID = [1996472029]
 
@@ -81,12 +81,16 @@ async def load_price(message : types.Message, state=FSMContext):
         async with state.proxy() as data:
             try:
                 data['price'] = float(message.text)
-                await message.reply(str(data))
+                #await message.reply(str(data))
             except:
                 await message.reply('Нужно ввести только число.\nДобавь пункт в меню заново.')
                 await state.finish()
-
-
+        try:
+            await sql_add(state)
+            await state.finish()
+            await message.reply('Добавлено успешно.')
+        except:
+            await message.reply('Ошибка в бае данных.\nПопробуй ещё раз.\nВозможно, такое имя уже существует.')
 
 def register_handler_admin(dp : Dispatcher):
     dp.register_message_handler(make_changes_command, commands=['Админ_панель'])

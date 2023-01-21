@@ -3,6 +3,7 @@ from aiogram import types, Dispatcher
 from create_bot import dp, bot
 from keyboards import kb_client
 from aiogram.types import ReplyKeyboardRemove
+from data_base.sqlite_db import sql_read
 
 async def command_start(message : types.Message):
     try:
@@ -18,14 +19,22 @@ async def pizza_open_command(message : types.Message):
         await message.reply('Мне можно написать только в личные сообщения.') 
 
 
-async def pizza_place_command(message : types.message):
+async def pizza_place_command(message : types.Message):
     try:
         await bot.send_message(message.from_user.id, 'Улица бана №15.', reply_markup=kb_client)
     except:
         await message.reply('Мне можно написать только в личные сообщения.') 
 
+async def get_menu(message : types.Message):
+    try:
+        await sql_read(message)
+    except:
+        await message.reply('Мне можно написать только в личные сообщения.') 
+
+    
 
 def register_handler_client(dp : Dispatcher):
     dp.register_message_handler(command_start, commands=['start', 'help'])
+    dp.register_message_handler(get_menu, commands=['Меню'])
     dp.register_message_handler(pizza_open_command, commands=['Режим_работы'])
     dp.register_message_handler(pizza_place_command, commands=['Расположение'])

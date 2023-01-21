@@ -2,11 +2,12 @@ from aiogram.utils import executor
 
 from create_bot import dp
 
-
+from data_base.sqlite_db import sql_start
 from handlers import client, admin, other
 
 async def on_startup(_):
-    print("Бот онлайн") 
+    print("Бот онлайн")
+    sql_start()
 
 
 admin.register_handler_admin(dp)
