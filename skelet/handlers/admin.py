@@ -81,8 +81,7 @@ async def load_price(message : types.Message, state=FSMContext):
         async with state.proxy() as data:
             try:
                 data['price'] = float(message.text)
-                async with state.proxy() as data:
-                    await message.reply(str(data))
+                await message.reply(str(data))
             except:
                 await message.reply('Нужно ввести только число.\nДобавь пункт в меню заново.')
                 await state.finish()
