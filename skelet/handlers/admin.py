@@ -7,6 +7,9 @@ from aiogram.dispatcher.filters import Text
 from keyboards import kb_admin, kb_client
 from aiogram.types import ReplyKeyboardRemove
 from data_base.sqlite_db import sql_add
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+
 
 admin_ID = [1996472029]
 
