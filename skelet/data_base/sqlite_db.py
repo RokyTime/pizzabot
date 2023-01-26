@@ -21,3 +21,13 @@ async def sql_add(state):
 async def sql_read(message):
     for ret in cur.execute('SELECT * FROM menu').fetchall():
         await bot.send_photo(message.from_user.id, ret[0], f'{ret[1]}\nОписание:\n{ret[2]}\nЦена:{ret[3]} руб.')
+
+
+
+async def sql_read2():
+    return cur.execute('SELECT * FROM menu').fetchall()
+
+
+async def delete_function(data):
+    cur.execute('DELETE FROM menu WHERE name == ?', (data,))
+    base.commit()
